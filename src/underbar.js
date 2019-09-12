@@ -102,21 +102,28 @@
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator = _.identity) {
-    let sortedArray = [];
+    let uniqArray = [];
 
     if (isSorted) {
       _.each(array, function (el, idx, arr) {
         const iterEl = iterator(el);
         const iterPrevEl = idx === 0 ? undefined : iterator(arr[idx - 1]);
         if (iterEl !== iterPrevEl) {
-          sortedArray.push(iterEl);
+          uniqArray.push(iterEl);
         }
       });
     } else {
-      // algo for unsorted
+      let prevEls = {};
+      _.each(array, function(el) {
+        const iterEl = iterator(el);
+        if (!prevEls.hasOwnProperty(iterEl)) {
+          prevEls[iterEl] = true;
+          uniqArray.push(iterEl);
+        }
+      });
     }
 
-    return sortedArray;
+    return uniqArray;
   };
 
 
@@ -125,6 +132,9 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+    let mappedCollection;
+
+    return mappedCollection;
   };
 
   /*
