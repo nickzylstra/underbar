@@ -101,15 +101,15 @@
   };
 
   // Produce a duplicate-free version of the array.
-  _.uniq = function(array, isSorted, iterator) {
+  _.uniq = function(array, isSorted, iterator = _.identity) {
     let sortedArray = [];
-    iterator = iterator ? iterator : _.identity;
 
     if (isSorted) {
       _.each(array, function (el, idx, arr) {
-        const elTrans = iterator(el);
-        if (idx === 0 || elTrans != iterator(arr[idx - 1])) {
-          sortedArray.push(elTrans);
+        const iterEl = iterator(el);
+        const iterPrevEl = idx === 0 ? undefined : iterator(arr[idx - 1]);
+        if (iterEl !== iterPrevEl) {
+          sortedArray.push(iterEl);
         }
       });
     } else {
