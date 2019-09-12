@@ -134,7 +134,11 @@
     // the members, it also maintains an array of results.
     let mappedCollection;
 
+<<<<<<< HEAD
     // for each
+=======
+    // another comment
+>>>>>>> master
 
     return mappedCollection;
   };
