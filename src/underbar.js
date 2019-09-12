@@ -134,6 +134,8 @@
     // the members, it also maintains an array of results.
     let mappedCollection;
 
+    // for each
+
     return mappedCollection;
   };
 
