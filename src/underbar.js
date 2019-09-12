@@ -49,7 +49,18 @@
   //
   // Note: _.each does not have a return value, but rather simply runs the
   // iterator function over each item in the input collection.
+  // input - array or object
+  // output - none
   _.each = function(collection, iterator) {
+    if (Array.isArray(collection)) {
+      for (let i = 0; i < collection.length ; i++) {
+        iterator(collection[i], i, collection);
+      }
+    } else { // else (is object)
+      for (let key in collection) {
+        iterator(collection[key], key, collection);
+      }
+    }
   };
 
   // Returns the index at which value can be found in the array, or -1 if value
@@ -71,16 +82,41 @@
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
+    let filteredCollection = [];
+
+    _.each(collection, function(el) {
+      if (test(el)) {
+        filteredCollection.push(el);
+      }
+    });
+
+    return filteredCollection;
   };
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
+    return _.filter(collection, (el) => !test(el));
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
+    let sortedArray = [];
+    iterator = iterator ? iterator : _.identity;
+
+    if (isSorted) {
+      _.each(array, function (el, idx, arr) {
+        const elTrans = iterator(el);
+        if (idx === 0 || elTrans != iterator(arr[idx - 1])) {
+          sortedArray.push(elTrans);
+        }
+      });
+    } else {
+      // algo for unsorted
+    }
+
+    return sortedArray;
   };
 
 
@@ -131,6 +167,12 @@
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
   };
+
+
+
+  // PART ONE ENDS HERE, STOP
+
+
 
   // Determine if the array or object contains a given value (using `===`).
   _.contains = function(collection, target) {
