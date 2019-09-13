@@ -57,8 +57,9 @@
         iterator(collection[i], i, collection);
       }
     } else { // else (is object)
-      for (const key in collection) {
-        iterator(collection[key], key, collection);
+      const keys = Object.keys(collection);
+      for (let i = 0; i < keys.length; i += 1) {
+        iterator(collection[keys[i]], keys[i], collection);
       }
     }
   };
@@ -154,9 +155,7 @@
     // TIP: map is really handy when you want to transform an array of
     // values into a new array of values. _.pluck() is solved for you
     // as an example of this.
-    return _.map(collection, function (item) {
-      return item[key];
-    });
+    return _.map(collection, (item) => item[key]);
   };
 
   // Reduces an array or object to a single value by repetitively calling
@@ -181,19 +180,19 @@
   //          No accumulator is given so the first element is used.
   _.reduce = function (collection, iterator, accumulator) {
     let accUndefined = accumulator === undefined;
-
+    let result = accumulator;
     // if removing if statement from loop is desired,
     // reimplement each with but adjusting start position
-    _.each(collection, function (item) {
+    _.each(collection, (item) => {
       if (accUndefined) {
-        accumulator = item;
+        result = item;
         accUndefined = false;
       } else {
-        accumulator = iterator(accumulator, item);
+        result = iterator(result, item);
       }
     });
 
-    return accumulator;
+    return result;
   };
 
 
@@ -204,7 +203,7 @@
   _.contains = function (collection, target) {
     // TIP: Many iteration problems can be most easily expressed in
     // terms of reduce(). Here's a freebie to demonstrate!
-    return _.reduce(collection, function (wasFound, item) {
+    return _.reduce(collection, (wasFound, item) => {
       if (wasFound) {
         return true;
       }
@@ -215,7 +214,7 @@
 
   // Determine whether all of the elements match a truth test.
   _.every = function (collection, iterator = _.identity) {
-    return _.reduce(collection, function (allMatch, item) {
+    return _.reduce(collection, (allMatch, item) => {
       if (!allMatch) {
         return false;
       }
