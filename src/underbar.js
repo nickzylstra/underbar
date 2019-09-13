@@ -258,11 +258,12 @@
   //   }, {
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
+  // mutates input
   _.extend = function (obj, ...args) {
     return _.reduce(args, (extendedObj, passedObj) => {
       _.each(passedObj, (value, key) => {
-        // eslint-disable-next-line no-param-reassign
         // https://github.com/airbnb/javascript/issues/719
+        // eslint-disable-next-line no-param-reassign
         extendedObj[key] = value;
       });
       return extendedObj;
@@ -271,6 +272,7 @@
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
+  // mutates input
   _.defaults = function (obj, ...args) {
     return _.reduce(args, (defaultedObj, passedObj) => {
       _.each(passedObj, (value, key) => {
