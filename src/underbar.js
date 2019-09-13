@@ -1,3 +1,4 @@
+/* eslint-disable strict */
 (function () {
   'use strict';
 
@@ -226,7 +227,16 @@
   // provided, provide a default one
   _.some = function (collection, iterator = _.identity) {
     // TIP: There's a very clever way to re-use every() here.
+    /* let hasSome = false;
 
+    _.each(collection, (el) => {
+      if (iterator(el)) {
+        hasSome = true;
+      }
+    });
+
+    return hasSome; */
+    return !_.every(collection, (el) => !iterator(el));
   };
 
 
@@ -248,12 +258,30 @@
   //   }, {
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
-  _.extend = function (obj) {
+  _.extend = function (obj, ...args) {
+    return _.reduce(args, (extendedObj, passedObj) => {
+      _.each(passedObj, (value, key) => {
+        // eslint-disable-next-line no-param-reassign
+        // https://github.com/airbnb/javascript/issues/719
+        extendedObj[key] = value;
+      });
+      return extendedObj;
+    }, obj);
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
-  _.defaults = function (obj) {
+  _.defaults = function (obj, ...args) {
+    return _.reduce(args, (defaultedObj, passedObj) => {
+      _.each(passedObj, (value, key) => {
+        if (!{}.hasOwnProperty.call(defaultedObj, key)) {
+          // https://github.com/airbnb/javascript/issues/719
+          // eslint-disable-next-line no-param-reassign
+          defaultedObj[key] = value;
+        }
+      });
+      return defaultedObj;
+    }, obj);
   };
 
 
