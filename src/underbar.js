@@ -276,7 +276,7 @@
   _.defaults = function (obj, ...args) {
     return _.reduce(args, (defaultedObj, passedObj) => {
       _.each(passedObj, (value, key) => {
-        if (!{}.hasOwnProperty.call(defaultedObj, key)) {
+        if (!Object.prototype.hasOwnProperty.call(defaultedObj, key)) {
           // https://github.com/airbnb/javascript/issues/719
           // eslint-disable-next-line no-param-reassign
           defaultedObj[key] = value;
@@ -301,16 +301,16 @@
     // TIP: These variables are stored in a "closure scope" (worth researching),
     // so that they'll remain available to the newly-generated function every
     // time it's called.
-    var alreadyCalled = false;
-    var result;
+    let alreadyCalled = false;
+    let result;
 
     // TIP: We'll return a new function that delegates to the old one, but only
     // if it hasn't been called before.
-    return function () {
+    return function (...args) {
       if (!alreadyCalled) {
         // TIP: .apply(this, arguments) is the standard way to pass on all of the
         // infromation from one function call to another.
-        result = func.apply(this, arguments);
+        result = func.apply(this, args);
         alreadyCalled = true;
       }
       // The new function always returns the originally computed result.
@@ -327,6 +327,15 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function (func) {
+    const results = {};
+    return (...args) => {
+      const key = JSON.stringify(args);
+      if (Object.prototype.hasOwnProperty.call(results, key)) {
+        return results[key];
+      }
+      results[key] = func(...args);
+      return results[key];
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -350,6 +359,17 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function (array) {
+    const { length } = array;
+    const result = [];
+    const arrayCopy = array.slice();
+
+    for (let i = 0; i < length; i += 1) {
+      const kindaRandIdx = Math.floor(Math.random() * (arrayCopy.length - 1));
+      result.push(arrayCopy[kindaRandIdx]);
+      arrayCopy.splice(kindaRandIdx, 1);
+    }
+
+    return result;
   };
 
   // EXTRA CREDIT BEYOND HERE
