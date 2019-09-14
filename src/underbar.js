@@ -326,7 +326,7 @@
   // _.memoize should return a function that, when called, will check if it has
   // already computed the result for the given argument and return that value
   // instead if possible.
-  _.memoize = function (func) {
+  _.memoize = function memoize(func) {
     const results = {};
     return (...args) => {
       const key = JSON.stringify(args);
@@ -344,7 +344,22 @@
   // The arguments for the original function are passed after the wait
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call somefunction ('a', 'b') after 500ms
-  _.delay = function (func, wait) {
+  _.delay = function delay(func, wait, ...args) {
+    // causes test error that seems strange
+    /* // wait
+    const start = new Date().getTime();
+    for (let i = 0; i < 1e7; i += 1) {
+      if ((new Date().getTime() - start) > wait) {
+        break;
+      }
+    }
+    // call func
+    func(...args);
+    */
+
+    // native version?  but passes tests...
+    // this spec is different than underbar github version that returns a function
+    setTimeout(func, wait, ...args);
   };
 
 
