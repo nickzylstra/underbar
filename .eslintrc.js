@@ -18,4 +18,6 @@ module.exports = {
   },
   rules: {
   },
+    plugins: [
+    ],
 };

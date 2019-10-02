@@ -310,7 +310,7 @@
       if (!alreadyCalled) {
         // TIP: .apply(this, arguments) is the standard way to pass on all of the
         // infromation from one function call to another.
-        result = func.apply(this, args);
+        result = func(...args);
         alreadyCalled = true;
       }
       // The new function always returns the originally computed result.
@@ -401,6 +401,11 @@
   // Calls the method named by functionOrKey on each value in the list.
   // Note: You will need to learn a bit about .apply to complete this.
   _.invoke = function (collection, functionOrKey, args) {
+    const iterator = typeof functionOrKey === 'function'
+      ? (el) => functionOrKey.apply(el, args)
+      : (el) => el[functionOrKey](args);
+
+    return _.map(collection, iterator);
   };
 
   // Sort the object's values by a criterion produced by an iterator.
