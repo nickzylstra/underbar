@@ -136,8 +136,8 @@
     // the members, it also maintains an array of results.
     const mappedCollection = [];
 
-    _.each(collection, (el) => {
-      mappedCollection.push(iterator(el));
+    _.each(collection, (el, prop, obj) => {
+      mappedCollection.push(iterator(el, prop, obj));
     });
 
     return mappedCollection;
@@ -413,6 +413,27 @@
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function (collection, iterator) {
+    const sortedCollection = [];
+    const procIter = typeof iterator === 'function' ? (obj) => iterator(obj) : (obj) => obj[iterator];
+
+    // could map, then sort, then pluck as done in actual underscore lib implementation
+
+    _.each(collection, (obj) => {
+      const iterObj = procIter(obj);
+
+      // find iterObj sorted position in sortedCollection and insert there
+      // if iterObj undefined, put at end of sC
+      // could optimize to use something other than insertion sort
+      let i = iterObj === undefined ? sortedCollection.length : 0;
+      let sCObj = sortedCollection[i];
+      while (sCObj !== undefined && iterObj >= procIter(sCObj)) {
+        i += 1;
+        sCObj = sortedCollection[i];
+      }
+      sortedCollection.splice(i, 0, obj);
+    });
+
+    return sortedCollection;
   };
 
   // Zip together two or more arrays with elements of the same index
@@ -420,7 +441,36 @@
   //
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
-  _.zip = function () {
+  _.zip = function (...args) {
+    /*
+    const zippedArr = [];
+    let lenLon = 0;
+    _.each(args, (arr) => {
+      const len = arr.length;
+      if (len > lenLon) lenLon = len;
+    });
+
+    for (let i = 0; i < lenLon; i += 1) {
+      const elArr = [];
+      _.each(args, (arr) => {
+        elArr.push(arr[i]);
+      });
+      zippedArr.push(elArr);
+    }
+
+    return zippedArr; */
+
+    const maxLen = _.reduce(args, (len, arr) => {
+      const elLen = arr.length;
+      return elLen > len ? elLen : len;
+    }, 0);
+
+    const zippedArr = Array(maxLen);
+    /* for (let i = 0; i < maxLen; i += 1) {
+      zippedArr[i] = _.pluck(args, i);
+    }
+    return zippedArr; */
+    return _.map(zippedArr, (el, idx) => _.pluck(args, idx));
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
