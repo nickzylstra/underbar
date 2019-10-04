@@ -546,6 +546,33 @@
   // on this function.
   //
   // Note: This is difficult! It may take a while to implement.
-  _.throttle = function (func, wait) {
+  _.throttle = function (func, msWait) {
+    let msLast;
+    let queued;
+    let result;
+    const queue = function queue(...args) {
+      result = func(...args);
+    };
+
+    return (...args) => {
+      const msNow = performance.now();
+      const msSinceLast = msLast ? msNow - msLast : msWait + 1;
+      console.log(`msLast is ${msLast}ms, msSinceLast is ${msSinceLast}ms, and queued is ${queued}`);
+      if (msSinceLast > msWait) {
+        if (queued) {
+          clearTimeout(queued);
+          queued = null;
+        }
+        result = func(...args);
+        msLast = msNow;
+      } else if (!queued) {
+        const msQueueWait = msWait - msSinceLast;
+        console.log(`msQueueWait is ${msQueueWait}ms`);
+        queued = setTimeout(queue, msQueueWait, ...args);
+        msLast += msQueueWait;
+      }
+
+      return result;
+    };
   };
 }());
