@@ -136,8 +136,8 @@
     // the members, it also maintains an array of results.
     const mappedCollection = [];
 
-    _.each(collection, (el, prop, obj) => {
-      mappedCollection.push(iterator(el, prop, obj));
+    _.each(collection, (val, key, obj) => {
+      mappedCollection.push(iterator(val, key, obj));
     });
 
     return mappedCollection;
@@ -477,12 +477,54 @@
   // The new array should contain all elements of the multidimensional array.
   //
   // Hint: Use Array.isArray to check if something is an array
-  _.flatten = function (nestedArray, result) {
+  _.flatten = function (nestedArray, result = []) {
+    // eslint-disable-next-line consistent-return
+    _.each(nestedArray, (el) => {
+      if (Array.isArray(el)) {
+        return _.flatten(el, result);
+      }
+      result.push(el);
+    });
+
+    return result;
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
-  _.intersection = function () {
+  _.intersection = function (arr1, ...otherArrays) {
+    const result = [];
+
+    // change parameters to '...arrays' if using this block of code
+    // O((NM)^2)
+    /* const arraysCount = arrays.length;
+    const keys = {};
+    _.each(arrays, (array) => {
+      _.each(array, (el) => {
+        if (!keys[el]) keys[el] = 0;
+        keys[el] += 1;
+      });
+    });
+
+    _.each(keys, (val, key) => {
+      if (val === arraysCount) result.push(key);
+    }); */
+
+    // is this faster than the above method? yes much
+    // change parameters to 'arr1, ...otherArrays' if using this block of code
+    const otherArraysCount = otherArrays.length;
+    for (let i = 0; i < arr1.length; i += 1) {
+      const arr1El = arr1[i];
+      if (!_.contains(result, arr1El)) {
+        let j = 0;
+        for (; j < otherArraysCount; j += 1) {
+          if (!_.contains(otherArrays[j], arr1El)) break;
+        }
+
+        if (j === otherArraysCount) result.push(arr1El);
+      }
+    }
+
+    return result;
   };
 
   // Take the difference between one array and a number of other arrays.
