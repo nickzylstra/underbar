@@ -529,8 +529,17 @@
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
-  _.difference = function (array) {
+  _.difference = function (array, ...otherArrays) {
+    return _.reject(array, (el) => _.contains(_.flatten(otherArrays), el));
   };
+  /* {
+    for (let i = 0; i < otherArrays.length; i += 1) {
+      if (_.contains(otherArrays[i], el)) {
+        return true;
+      }
+    }
+    return false;
+  } */
 
   // Returns a function, that, when invoked, will only be triggered at most once
   // during a given window of time.  See the Underbar readme for extra details
