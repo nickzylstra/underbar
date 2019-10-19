@@ -41,8 +41,7 @@
   _.last = function (array, n) {
     const len = array.length;
     if (n === undefined) return array[len - 1];
-    if (n > len) return array;
-    return array.slice(len - n, len);
+    return array.slice(Math.max(0, len - n));
   };
 
   // Call iterator(value, key, collection) for each element of collection.
@@ -62,6 +61,9 @@
       for (let i = 0; i < keys.length; i += 1) {
         iterator(collection[keys[i]], keys[i], collection);
       }
+      /* for (key in collection) {
+        iterator(collection[key], key, collection);
+      } */
     }
   };
 
@@ -84,15 +86,15 @@
 
   // Return all elements of an array that pass a truth test.
   _.filter = function (collection, test) {
-    const filteredCollection = [];
+    const filteredElements = [];
 
     _.each(collection, (el) => {
       if (test(el)) {
-        filteredCollection.push(el);
+        filteredElements.push(el);
       }
     });
 
-    return filteredCollection;
+    return filteredElements;
   };
 
   // Return all elements of an array that don't pass a truth test.
@@ -107,12 +109,13 @@
     const uniqArray = [];
 
     if (isSorted) {
-      _.each(array, (el, idx, arr) => {
+      let iterPrevEl;
+      _.each(array, (el) => {
         const iterEl = iterator(el);
-        const iterPrevEl = idx === 0 ? undefined : iterator(arr[idx - 1]);
         if (iterEl !== iterPrevEl) {
           uniqArray.push(iterEl);
         }
+        iterPrevEl = iterEl;
       });
     } else {
       const prevEls = {};
@@ -134,13 +137,13 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
-    const mappedCollection = [];
+    const mappedElements = [];
 
     _.each(collection, (val, key, obj) => {
-      mappedCollection.push(iterator(val, key, obj));
+      mappedElements.push(iterator(val, key, obj));
     });
 
-    return mappedCollection;
+    return mappedElements;
   };
 
   /*
@@ -215,11 +218,12 @@
 
   // Determine whether all of the elements match a truth test.
   _.every = function (collection, iterator = _.identity) {
-    return _.reduce(collection, (allMatch, item) => {
-      if (!allMatch) {
+    return _.reduce(collection, (prevItemsTrue, item) => {
+      /* if (!allMatch) {
         return false;
       }
-      return Boolean(iterator(item));
+      return Boolean(iterator(item)); */
+      return prevItemsTrue && Boolean(iterator(item));
     }, true);
   };
 
@@ -260,21 +264,28 @@
   //   }); // obj1 now contains key1, key2, key3 and bla
   // mutates input
   _.extend = function (obj, ...args) {
-    return _.reduce(args, (extendedObj, passedObj) => {
+    /* return _.reduce(args, (extendedObj, passedObj) => {
       _.each(passedObj, (value, key) => {
         // https://github.com/airbnb/javascript/issues/719
         // eslint-disable-next-line no-param-reassign
         extendedObj[key] = value;
       });
       return extendedObj;
-    }, obj);
+    }, obj); */
+    _.each(args, (sourceObj) => {
+      _.each(sourceObj, (value, key) => {
+        // eslint-disable-next-line no-param-reassign
+        obj[key] = value;
+      });
+    });
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   // mutates input
   _.defaults = function (obj, ...args) {
-    return _.reduce(args, (defaultedObj, passedObj) => {
+    /* return _.reduce(args, (defaultedObj, passedObj) => {
       _.each(passedObj, (value, key) => {
         if (!Object.prototype.hasOwnProperty.call(defaultedObj, key)) {
           // https://github.com/airbnb/javascript/issues/719
@@ -283,7 +294,16 @@
         }
       });
       return defaultedObj;
-    }, obj);
+    }, obj); */
+    _.each(args, (sourceObj) => {
+      _.each(sourceObj, (value, key) => {
+        if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+          // eslint-disable-next-line no-param-reassign
+          obj[key] = value;
+        }
+      });
+    });
+    return obj;
   };
 
 
@@ -330,10 +350,9 @@
     const results = {};
     return (...args) => {
       const key = JSON.stringify(args);
-      if (Object.prototype.hasOwnProperty.call(results, key)) {
-        return results[key];
+      if (!Object.prototype.hasOwnProperty.call(results, key)) {
+        results[key] = func(...args);
       }
-      results[key] = func(...args);
       return results[key];
     };
   };
